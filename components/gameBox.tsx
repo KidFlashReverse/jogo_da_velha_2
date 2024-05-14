@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction } from "react"
+import { winCoordinateInfo } from "@/typescript/constantes";
+import { Dispatch, SetStateAction, useState } from "react"
 
 export default function GameBox({
     boxValue,
@@ -6,14 +7,17 @@ export default function GameBox({
     hashtagMap,
     playerOne,
     setPlayerOne,
+    winPlayer,
+    winCoordinates
 }: {
     boxValue: string,
     index: number,
     hashtagMap: any[],
     playerOne: boolean,
-    setPlayerOne: Dispatch<SetStateAction<boolean>>
+    setPlayerOne: Dispatch<SetStateAction<boolean>>,
+    winPlayer: string,
+    winCoordinates: number | undefined,
 }) {
-
     const checkValue = () => {
         if(boxValue === 'X'){
             return (
@@ -27,7 +31,7 @@ export default function GameBox({
                         backgroundSize: '200% 100%',
                         backgroundPosition: 'right',
                         rotate: '45deg',
-                        animation: 'XAnimation 0.7s forwards',
+                        animation: 'XAnimation 0.5s forwards',
                         animationDelay: '0.5s',
                     }} />
                     <div style={{
@@ -39,7 +43,7 @@ export default function GameBox({
                         backgroundSize: '200% 100%',
                         backgroundPosition: 'right',
                         rotate: '-45deg',
-                        animation: 'XAnimation 0.7s forwards',
+                        animation: 'XAnimation 0.5s forwards',
                         animationDelay: '0.2s',
                     }} />
                 </>
@@ -60,7 +64,7 @@ export default function GameBox({
                                 strokeWidth: '4px',
                                 strokeDasharray: '250',
                                 strokeDashoffset: '250',
-                                animation: 'OAnimation 1.5s forwards',
+                                animation: 'OAnimation 1s forwards',
                             }}
                         />
                     </svg>
@@ -69,6 +73,42 @@ export default function GameBox({
         }
 
         return <></>
+    }
+
+    const checkVictory = () => {
+        const positionIndex = winCoordinateInfo(winCoordinates).indexs;
+        const rotate = winCoordinateInfo(winCoordinates).rotate;
+        const delay = () => {
+            if(positionIndex[0] === index){
+                return 0.2
+            }
+            if(positionIndex[1] === index){
+                return 0.4
+            }
+            if(positionIndex[2] === index){
+                return 0.6
+            }
+        };
+
+        if(!positionIndex?.includes(index)){
+            return <></>
+        }
+
+        return (
+            <div style={{
+                position: 'absolute',
+                width: [45, 135].includes(rotate) ? '310px' : '250px',
+                height: '8px',
+                backgroundColor: 'red',
+                background: 'linear-gradient(to right, #F05E16 50%, transparent 0%)',
+                backgroundSize: '200% 100%',
+                backgroundPosition: 'right',
+                borderRadius: '10px',
+                rotate: `${rotate}deg`,
+                animation: 'XAnimation 0.5s forwards',
+                animationDelay: `${delay()}s`
+            }}/>
+        );
     }
 
     const handleOnClick = () => {
@@ -90,7 +130,7 @@ export default function GameBox({
                 justifyContent: 'center',
                 alignItems: 'center'
             }}
-            onClick={() => boxValue === '' ? handleOnClick() : null}
+            onClick={() => boxValue === '' && winPlayer === '' ? handleOnClick() : null}
         > 
             <div style={{
                 display: 'flex',
@@ -98,6 +138,7 @@ export default function GameBox({
                 alignItems: 'center'
             }}>
                 {checkValue()}
+                {checkVictory()}
             </div>
         </div>
     )
